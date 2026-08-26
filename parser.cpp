@@ -34,3 +34,25 @@ void trimIndent_trailingSpaces(vector<string>* lines) {
         lines->at(i) = trimmed;
     }
 }
+
+void splitSpaces(const vector<string>& lines, vector<vector<string>>* dest) {
+    vector<vector<string>> result;
+    vector<string> current;
+    for (const string& line : lines) {
+        string current_comp;
+        for (const char character : line) {
+            if (!isspace(character)) {
+                current_comp.append({character,'\0'});
+            } else {
+                current_comp.clear();
+                current.push_back(current_comp);
+            }
+        }
+        if (!current.empty()) {
+            current.push_back(current_comp);
+        }
+        result.push_back(current);
+    }
+    dest->swap(result);
+    dest->shrink_to_fit();
+}
