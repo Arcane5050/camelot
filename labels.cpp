@@ -21,7 +21,7 @@ void inlineLabels(vector<vector<string>>* IR) {
             string* comp = &instr->at(comp_index);
             auto label_table_index = label_table.find(*comp);
             if (label_table_index != label_table.end()) {
-                *comp = to_string(label_table_index->second);
+                *comp = "addr" + to_string(label_table_index->second);
             }
         }
     }

@@ -7,7 +7,7 @@ using namespace std;
 #include "labels.hpp"
 #include "macros.hpp"
 
-static void error(const string& msg, const string& file);
+static void error(const string& msg, const string& prefix);
 
 int main(int argc, char** argv) {
     const string& filepath = argv[1];
@@ -36,6 +36,6 @@ int main(int argc, char** argv) {
     translate(IR, &bytecode);
 }
 
-void error(const string& msg, const string& file) {
-    cout << "\033[38;2;255;0;0m" << file << ": " << msg << "\033[39m\n";
+void error(const string& msg, const string& prefix) {
+    cout << "\033[38;2;255;0;0m" << prefix << ": " << msg << "\033[39m\n";
 }

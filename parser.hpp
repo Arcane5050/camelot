@@ -2,6 +2,7 @@
 #define PARSE_H
 #include <string>
 #include <vector>
+#include <map>
 using namespace std;
 
 void trimIndent_trailingSpaces(vector<string>* lines);
