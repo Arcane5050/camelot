@@ -33,6 +33,15 @@ int main(int argc, char** argv) {
         error(to_string(errors_found) + " errors found", "FAIL");
         return 1;
     }
+    cout << "[\n";
+    for (const vector<char>& instr : bytecode) {
+        cout << "  [ ";
+        for (const char& c : instr) {
+            cout << static_cast<int>(c) << ", ";
+        }
+        cout << "],\n";
+    }
+    cout << "]\n";
 }
 
 void error(const string& msg, const string& prefix) {
