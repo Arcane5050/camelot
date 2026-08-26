@@ -77,7 +77,11 @@ void splitSpaces(const vector<string>& lines, vector<vector<string>>* dest) {
     vector<vector<string>> result;
     result.reserve(lines.size());
     for (const string& line : lines) {
-        result.push_back(splitLineBySpaces(line));
+        vector<string> current = splitLineBySpaces(line);
+        const auto max = static_cast<short>(current.size());
+        for (short i = 0; i < 4 - max; i++) {
+            current.emplace_back("");
+        }
     }
     dest->swap(result);
     dest->shrink_to_fit();
