@@ -1,13 +1,8 @@
-#include <iostream>
-#include <fstream>
-#include <string>
-using namespace std;
+#include "camelot.hpp"
 
 #include "parser.hpp"
 #include "labels.hpp"
 #include "macros.hpp"
-
-static void error(const string& msg, const string& prefix);
 
 int main(int argc, char** argv) {
     const string& filepath = argv[1];
@@ -34,6 +29,10 @@ int main(int argc, char** argv) {
     inlineMacros(&IR);
     vector<vector<char>> bytecode;
     translate(IR, &bytecode);
+    if (errors_found > 0) {
+        error(to_string(errors_found) + " errors found", "FAIL");
+        return 1;
+    }
 }
 
 void error(const string& msg, const string& prefix) {

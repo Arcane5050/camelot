@@ -55,23 +55,29 @@ void trimIndent_trailingSpaces(vector<string>* lines) {
     }
 }
 
+vector<string> splitLineBySpaces(const string& line) {
+    vector<string> result;
+    string current;
+    for (const char character : line) {
+        if (!isspace(character)) {
+            current.append({character,'\0'});
+        } else {
+            current.clear();
+            result.push_back(current);
+        }
+    }
+    if (!current.empty()) {
+        result.push_back(current);
+    }
+    result.shrink_to_fit();
+    return result;
+}
+
 void splitSpaces(const vector<string>& lines, vector<vector<string>>* dest) {
     vector<vector<string>> result;
-    vector<string> current;
+    result.reserve(lines.size());
     for (const string& line : lines) {
-        string current_comp;
-        for (const char character : line) {
-            if (!isspace(character)) {
-                current_comp.append({character,'\0'});
-            } else {
-                current_comp.clear();
-                current.push_back(current_comp);
-            }
-        }
-        if (!current.empty()) {
-            current.push_back(current_comp);
-        }
-        result.push_back(current);
+        result.push_back(splitLineBySpaces(line));
     }
     dest->swap(result);
     dest->shrink_to_fit();
@@ -83,9 +89,9 @@ static bool startsWith(const string& src, const string& search) {
     }
     return false;
 }
-static void trimNonInt(string* dest) {
+void trimNonInt(const string& source, string* dest) {
     string reconstructed;
-    for (const char c : *dest) {
+    for (const char c : source) {
         if (isalnum(c)) {
             reconstructed.append({c,0});
         }
@@ -97,8 +103,17 @@ static void trimNonInt(string* dest) {
 void translate(const vector<vector<string>>& IR, vector<vector<char>>* bytecode) {
     vector<vector<char>> result;
     vector<char> wip_instr;
+    size_t instr_pos = 0;
     for (const vector<string>& instr : IR) {
-        wip_instr.push_back(instruction_table[instr[0]]);
+        char opcode;
+        auto index = instruction_table.find(instr[0]);
+        if (index != instruction_table.end()) {
+            opcode = index->second;
+        } else {
+            error("Invalid instruction", to_string(instr_pos));
+            errors_found++;
+        }
+        wip_instr.push_back(opcode);
         for (short i = 0; i < 4; i++) {
             string comp = instr[i];
             if (comp.empty()) {
@@ -109,11 +124,19 @@ void translate(const vector<vector<string>>& IR, vector<vector<char>>* bytecode)
                 startsWith(comp, "reg")  ||
                 startsWith(comp, "n")
             ) {
-                trimNonInt(&comp);
+                trimNonInt(comp, &comp);
                 wip_instr.push_back(static_cast<char>(stoi(comp)));
+            } else {
+                if (comp.size() == 1) {
+                    wip_instr.push_back(comp[0]);
+                } else {
+                    error("Label/Macro not found: " + comp, to_string(instr_pos));
+                    errors_found++;
+                }
             }
         }
         wip_instr.shrink_to_fit();
         result.push_back(wip_instr);
+        instr_pos++;
     }
 }

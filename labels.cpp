@@ -1,13 +1,13 @@
 #include "labels.hpp"
 
-static map<string, size_t> label_table;
+static map<string, string> label_table;
 
 void parseLabels(const vector<string>* lines) {
     const size_t max = lines->size();
     for (size_t i = 0; i < max; i++) {
         const string& line = lines->at(i);
         if (line[line.size() - 1] == ':') {
-            label_table[line.substr(0, line.size() - 1)] = i;
+            label_table[line.substr(0, line.size() - 1)] = to_string(i);
         }
     }
 }
@@ -21,7 +21,7 @@ void inlineLabels(vector<vector<string>>* IR) {
             string* comp = &instr->at(comp_index);
             auto label_table_index = label_table.find(*comp);
             if (label_table_index != label_table.end()) {
-                *comp = "addr" + to_string(label_table_index->second);
+                *comp = "addr" + label_table_index->second;
             }
         }
     }
