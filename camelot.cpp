@@ -1,4 +1,6 @@
 #include "camelot.hpp"
+#include <sstream>
+#include <cstring>
 
 #include "parser.hpp"
 #include "labels.hpp"

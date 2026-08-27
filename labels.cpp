@@ -3,8 +3,7 @@
 static map<string, string> label_table = {};
 
 void parseLabels(vector<string>* lines) {
-    const size_t max = lines->size();
-    for (size_t i = 0; i < max; i++) {
+    for (size_t i = 0; i < EOF_; i++) {
         const string& line = lines->at(i);
         if (!line.empty()) {
             if (line[line.size() - 1] == ':') {
@@ -16,8 +15,7 @@ void parseLabels(vector<string>* lines) {
 }
 
 void inlineLabels(vector<vector<string>>* IR) {
-    const size_t max = IR->size();
-    for (size_t i = 0; i < max; i++) {
+    for (size_t i = 0; i < EOF_; i++) {
         vector<string>* instr = &IR->at(i);
         for (size_t comp_index = 1; comp_index < INSTR_SIZE; comp_index++) {
             string* comp = &instr->at(comp_index);

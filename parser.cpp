@@ -28,13 +28,12 @@ void removeEmptyLines(vector<string>* lines) {
             reconstructed.push_back(line);
         }
     }
-    reconstructed.shrink_to_fit();
     lines->swap(reconstructed);
+    lines->shrink_to_fit();
 }
 
 void trimIndent_trailingSpaces(vector<string>* lines) {
-    const size_t size = lines->size();
-    for (size_t i = 0; i < size; i++) {
+    for (size_t i = 0; i < EOF_; i++) {
         const string& current_line = lines->at(i);
         const size_t max = current_line.size();
         size_t front = 0;
@@ -76,7 +75,7 @@ vector<string> splitLineBySpaces(const string& line) {
 
 void splitSpaces(const vector<string>& lines, vector<vector<string>>* dest) {
     vector<vector<string>> result;
-    result.reserve(lines.size());
+    result.reserve(EOF_);
     for (const string& line : lines) {
         vector<string> current = splitLineBySpaces(line);
         const auto max = static_cast<short>(current.size());
