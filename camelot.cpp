@@ -5,9 +5,7 @@
 #include "macros.hpp"
 
 int main(int argc, char** argv) {
-    const string& filepath = argv[1];
-    cout << filepath << "\n";
-    ifstream file(filepath);
+    ifstream file(argv[1]);
     if (!file.is_open()) {
         error("File not found", argv[1]);
         return 1;

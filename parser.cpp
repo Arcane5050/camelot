@@ -1,23 +1,24 @@
 #include "parser.hpp"
 
-static map<string, char> instruction_table = {
-    { "mrcopy", 0x00 },
-    { "rmcopy", 0x01 },
-    { "extern", 0x02 },
-    { "rcomp",  0x03 },
-    { "cexit",  0x04 },
-    { "mprint", 0x05 },
-    { "minput", 0x06 },
-    { "radd",   0x07 },
-    { "rsub",   0x08 },
-    { "rless",  0x09 },
-    { "rmore",  0x0A },
-    { "dmcopy", 0x0B },
-    { "mdcopy", 0x0C },
-    { "jmp",    0x0D },
-    { "cjmp",   0x0E },
-    { "mjmp",   0x0F },
-    { "rmove",  0x10 },
+static const string instruction_table[INSTR_COUNT] = {
+    "mrcopy",
+    "rmcopy",
+    "extern",
+    "rcomp",
+    "cexit",
+    "mprint",
+    "minput",
+    "radd",
+    "rsub",
+    "rless",
+    "rmore",
+    "dmcopy",
+    "mdcopy",
+    "jmp",
+    "cjmp",
+    "rlock",
+    "rmove",
+    "ret"
 };
 
 void removeEmptyLines(vector<string>* lines) {
@@ -62,8 +63,8 @@ vector<string> splitLineBySpaces(const string& line) {
         if (!isspace(character)) {
             current.append({character,'\0'});
         } else {
-            current.clear();
             result.push_back(current);
+            current.clear();
         }
     }
     if (!current.empty()) {
@@ -79,9 +80,10 @@ void splitSpaces(const vector<string>& lines, vector<vector<string>>* dest) {
     for (const string& line : lines) {
         vector<string> current = splitLineBySpaces(line);
         const auto max = static_cast<short>(current.size());
-        for (short i = 0; i < 4 - max; i++) {
+        for (short i = 0; i < INSTR_SIZE - max; i++) {
             current.emplace_back("");
         }
+        result.push_back(current);
     }
     dest->swap(result);
     dest->shrink_to_fit();
@@ -93,10 +95,21 @@ static bool startsWith(const string& src, const string& search) {
     }
     return false;
 }
+
+static string trimNullChars(const string& source) {
+    string reconstructed;
+    for (const char c : source) {
+        if (c != '\0') {
+            reconstructed.push_back(c);
+        }
+    }
+    return reconstructed;
+}
+
 void trimNonInt(const string& source, string* dest) {
     string reconstructed;
     for (const char c : source) {
-        if (isalnum(c)) {
+        if (isdigit(c)) {
             reconstructed.append({c,0});
         }
     }
@@ -109,21 +122,25 @@ void translate(const vector<vector<string>>& IR, vector<vector<char>>* bytecode)
     vector<char> wip_instr;
     size_t instr_pos = 0;
     for (const vector<string>& instr : IR) {
-        char opcode;
-        auto index = instruction_table.find(instr[0]);
-        if (index != instruction_table.end()) {
-            opcode = index->second;
-        } else {
+        char opcode = -1;
+        const string& instr_name = trimNullChars(instr[0]);
+        for (short i = 0; i < INSTR_COUNT; i++) {
+            const string& current = instruction_table[i];
+            if (instr_name == current) {
+                opcode = static_cast<char>(i);
+                break;
+            }
+        }
+        if (opcode == -1) {
             error("Invalid instruction", to_string(instr_pos));
             errors_found++;
         }
         wip_instr.push_back(opcode);
-        for (short i = 0; i < 4; i++) {
-            string comp = instr[i];
+        for (short i = 1; i < INSTR_SIZE; i++) {
+            string comp = trimNullChars(instr[i]);
             if (comp.empty()) {
                 wip_instr.push_back(0);
-            }
-            if (
+            } else if (
                 startsWith(comp, "addr") ||
                 startsWith(comp, "reg")  ||
                 startsWith(comp, "n")
@@ -143,4 +160,6 @@ void translate(const vector<vector<string>>& IR, vector<vector<char>>* bytecode)
         result.push_back(wip_instr);
         instr_pos++;
     }
+    bytecode->swap(result);
+    bytecode->shrink_to_fit();
 }

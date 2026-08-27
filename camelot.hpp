@@ -1,5 +1,9 @@
 #ifndef CAMELOT_H
 #define CAMELOT_H
+
+#define INSTR_SIZE 4
+#define INSTR_COUNT 18
+
 #include <iostream>
 #include <fstream>
 #include <string>

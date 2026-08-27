@@ -5,6 +5,7 @@
 #include <map>
 using namespace std;
 
+#include "camelot.hpp"
 #include "parser.hpp"
 
 void parseMacros(vector<vector<string>>* IR);
