@@ -4,7 +4,12 @@
 #include "labels.hpp"
 #include "macros.hpp"
 
+static bool do_verbose = false;
+
 int main(int argc, char** argv) {
+    if (strcmp(argv[argc - 1], "--verbose") == 0) {
+        do_verbose = true;
+    }
     ifstream file(argv[1]);
     if (!file.is_open()) {
         error("File not found", argv[1]);
@@ -19,18 +24,27 @@ int main(int argc, char** argv) {
     file.close();
     vector<vector<string>> IR;
     trimIndent_trailingSpaces(&lines);
-    removeEmptyLines(&lines);
+    verbose("Removed indent and trailing spaces", "Formatting");
     parseLabels(&lines);
+    verbose("Parsed all labels", "Labels");
+    removeEmptyLines(&lines);
+    verbose("Removed all empty lines", "Formatting");
     splitSpaces(lines, &IR);
+    verbose("Split all lines by spaces", "Formatting");
     parseMacros(&IR);
+    verbose("Parsed all macros", "Macros");
     inlineLabels(&IR);
+    verbose("Inlined all labels", "Labels");
     inlineMacros(&IR);
+    verbose("Inlined all macros", "Macros");
     vector<vector<char>> bytecode;
     translate(IR, &bytecode);
+    verbose("Translated all instructions and arguments to 8-bit integers", "Parse");
     if (errors_found > 0) {
-        error(to_string(errors_found) + " errors found", "FAIL");
+        error(to_string(errors_found) + " error(s) found", "FAIL");
         return 1;
     }
+    verbose("Completed", "");
     cout << "[\n";
     for (const vector<char>& instr : bytecode) {
         cout << "  [ ";
@@ -43,5 +57,15 @@ int main(int argc, char** argv) {
 }
 
 void error(const string& msg, const string& prefix) {
-    cout << "\033[38;2;255;0;0m" << prefix << ": " << msg << "\033[39m\n";
+    cout << "\033[38;2;255;0;0m[@] " << prefix << ": " << msg << "\033[39m\n";
+}
+
+void verbose(const string& msg, const string& prefix) {
+    if (do_verbose) {
+        string color = "\033[38;2;0;255;0m[!] ";
+        if (errors_found > 0) {
+            color = "\033[38;2;255;255;0m[!] ";
+        }
+        cout << color << prefix << ": " << msg << "\033[39m\n";
+    }
 }

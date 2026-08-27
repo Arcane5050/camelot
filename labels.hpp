@@ -7,7 +7,7 @@ using namespace std;
 
 #include "camelot.hpp"
 
-void parseLabels(const vector<string>* lines);
+void parseLabels(vector<string>* lines);
 void inlineLabels(vector<vector<string>>* IR);
 
 #endif

@@ -148,6 +148,7 @@ void translate(const vector<vector<string>>& IR, vector<vector<char>>* bytecode)
         }
         wip_instr.shrink_to_fit();
         result.push_back(wip_instr);
+        wip_instr.clear();
         instr_pos++;
     }
     bytecode->swap(result);
