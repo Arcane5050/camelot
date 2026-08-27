@@ -31,6 +31,7 @@ int main(int argc, char** argv) {
     parseLabels(&lines);
     verbose("Parsed all labels", "Labels");
     removeEmptyLines(&lines);
+    EOF_ = lines.size();
     verbose("Removed all empty lines", "Formatting");
     splitSpaces(lines, &IR);
     verbose("Split all lines by spaces", "Formatting");
