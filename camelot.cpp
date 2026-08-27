@@ -9,22 +9,25 @@
 static bool do_verbose = false;
 
 int main(int argc, char** argv) {
-    if (strcmp(argv[argc - 1], "--verbose") == 0) {
-        do_verbose = true;
-    }
-    ifstream file(argv[1]);
-    if (!file.is_open()) {
-        error("File not found", argv[1]);
-        return 1;
-    }
     vector<string> lines;
-    string current_line;
-    while (getline(file, current_line)) {
-        lines.push_back(current_line);
+    for (size_t i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "--verbose") == 0) {
+            do_verbose = true;
+        } else {
+            ifstream file(argv[i]);
+            if (!file.is_open()) {
+                error("File not found", argv[i]);
+                return 1;
+            }
+            string current_line;
+            while (getline(file, current_line)) {
+                lines.push_back(current_line);
+            }
+            file.close();
+        }
     }
     lines.shrink_to_fit();
     EOF_ = lines.size();
-    file.close();
     vector<vector<string>> IR;
     trimIndent_trailingSpaces(&lines);
     verbose("Removed indent and trailing spaces", "Formatting");
