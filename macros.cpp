@@ -14,6 +14,7 @@ void parseMacros(vector<vector<string>>* IR) {
         if (instr->at(0)[0] == '#') {
             const string& val = instr->at(1);
             const string& reg = instr->at(2);
+            validateRegister(reg, i);
             macro_table[instr->at(0)] = reg;
             replaced[1] = val;
             replaced[2] = reg;

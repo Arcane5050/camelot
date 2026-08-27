@@ -95,15 +95,14 @@ static bool startsWith(const string& src, const string& search) {
     return false;
 }
 
-void trimNonInt(const string& source, string* dest) {
+string trimNonInt(const string& source) {
     string reconstructed;
     for (const char c : source) {
         if (isdigit(c)) {
             reconstructed.push_back(c);
         }
     }
-    dest->swap(reconstructed);
-    dest->shrink_to_fit();
+    return reconstructed;
 }
 
 void translate(const vector<vector<string>>& IR, vector<vector<char>>* bytecode) {
@@ -131,10 +130,13 @@ void translate(const vector<vector<string>>& IR, vector<vector<char>>* bytecode)
                 wip_instr.push_back(0);
             } else if (
                 startsWith(comp, "addr") ||
-                startsWith(comp, "reg")  ||
                 startsWith(comp, "n")
             ) {
-                trimNonInt(comp, &comp);
+                comp = trimNonInt(comp);
+                wip_instr.push_back(static_cast<char>(stoi(comp)));
+            } else if (startsWith(comp, "reg")) {
+                validateRegister(comp, instr_pos);
+                comp = trimNonInt(comp);
                 wip_instr.push_back(static_cast<char>(stoi(comp)));
             } else {
                 if (comp.size() == 1) {

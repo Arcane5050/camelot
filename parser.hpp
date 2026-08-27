@@ -8,7 +8,7 @@ using namespace std;
 #include "camelot.hpp"
 
 vector<string> splitLineBySpaces(const string& line);
-void trimNonInt(const string& source, string* dest);
+string trimNonInt(const string& source);
 
 void trimIndent_trailingSpaces(vector<string>* lines);
 void removeEmptyLines(vector<string>* lines);
