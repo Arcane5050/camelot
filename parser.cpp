@@ -61,7 +61,7 @@ vector<string> splitLineBySpaces(const string& line) {
     string current;
     for (const char character : line) {
         if (!isspace(character)) {
-            current.append({character,'\0'});
+            current.push_back(character);
         } else {
             result.push_back(current);
             current.clear();
@@ -96,21 +96,11 @@ static bool startsWith(const string& src, const string& search) {
     return false;
 }
 
-static string trimNullChars(const string& source) {
-    string reconstructed;
-    for (const char c : source) {
-        if (c != '\0') {
-            reconstructed.push_back(c);
-        }
-    }
-    return reconstructed;
-}
-
 void trimNonInt(const string& source, string* dest) {
     string reconstructed;
     for (const char c : source) {
         if (isdigit(c)) {
-            reconstructed.append({c,0});
+            reconstructed.push_back(c);
         }
     }
     dest->swap(reconstructed);
@@ -123,7 +113,7 @@ void translate(const vector<vector<string>>& IR, vector<vector<char>>* bytecode)
     size_t instr_pos = 0;
     for (const vector<string>& instr : IR) {
         char opcode = -1;
-        const string& instr_name = trimNullChars(instr[0]);
+        const string& instr_name = instr[0];
         for (short i = 0; i < INSTR_COUNT; i++) {
             const string& current = instruction_table[i];
             if (instr_name == current) {
@@ -137,7 +127,7 @@ void translate(const vector<vector<string>>& IR, vector<vector<char>>* bytecode)
         }
         wip_instr.push_back(opcode);
         for (short i = 1; i < INSTR_SIZE; i++) {
-            string comp = trimNullChars(instr[i]);
+            string comp = instr[i];
             if (comp.empty()) {
                 wip_instr.push_back(0);
             } else if (
