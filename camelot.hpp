@@ -11,6 +11,7 @@
 using namespace std;
 
 inline int errors_found = 0;
+inline size_t EOF_;
 
 void error(const string& msg, const string& prefix);
 void verbose(const string& msg, const string& prefix);

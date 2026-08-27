@@ -3,6 +3,8 @@
 static map<string, string> macro_table = {};
 
 void parseMacros(vector<vector<string>>* IR) {
+    macro_table["#EOF"] = to_string(EOF_);
+    macro_table["#DEOF"] = to_string(EOF_ * 4);
     vector<string> replaced = {
         "rmove", "?", "?", ""
     };
@@ -30,6 +32,8 @@ void inlineMacros(vector<vector<string>>* IR) {
                 auto macro_table_index = macro_table.find(*comp);
                 if (macro_table_index != macro_table.end()) {
                     *comp = "addr" + macro_table_index->second;
+                } else if (*comp == "#HERE") {
+                    *comp = "addr" + to_string(i);
                 }
             }
         }

@@ -21,6 +21,7 @@ int main(int argc, char** argv) {
         lines.push_back(current_line);
     }
     lines.shrink_to_fit();
+    EOF_ = lines.size();
     file.close();
     vector<vector<string>> IR;
     trimIndent_trailingSpaces(&lines);
