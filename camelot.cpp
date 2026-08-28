@@ -15,7 +15,7 @@ int main(int argc, char** argv) {
         return 0;
     }
     vector<string> lines;
-    string out_file = "out.mpa";
+    string out_file = "out.abf";
     for (size_t i = 1; i < argc; i++) {
         if (strcmp(argv[i], "--verbose") == 0) {
             do_verbose = true;

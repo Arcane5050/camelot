@@ -16,9 +16,8 @@ static const string instruction_table[INSTR_COUNT] = {
     "mdcopy",
     "jmp",
     "cjmp",
-    "rlock",
+    "rjmp",
     "rmove",
-    "ret"
 };
 
 void removeEmptyLines(vector<string>* lines) {
