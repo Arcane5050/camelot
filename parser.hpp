@@ -13,6 +13,6 @@ string trimNonInt(const string& source);
 void trimIndent_trailingSpaces(vector<string>* lines);
 void removeEmptyLines(vector<string>* lines);
 void splitSpaces(const vector<string>& lines, vector<vector<string>>* dest);
-void translate(const vector<vector<string>>& IR, vector<vector<char>>* bytecode);
+void translate(const vector<vector<string>>& IR, vector<byte_t>* bytecode);
 
 #endif

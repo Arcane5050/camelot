@@ -15,6 +15,8 @@
 #include <string>
 using namespace std;
 
+typedef unsigned char byte_t;
+
 inline int errors_found = 0;
 inline size_t EOF_;
 inline constexpr int reg_count = 32;

@@ -105,12 +105,11 @@ string trimNonInt(const string& source) {
     return reconstructed;
 }
 
-void translate(const vector<vector<string>>& IR, vector<vector<char>>* bytecode) {
-    vector<vector<char>> result;
-    vector<char> wip_instr;
+void translate(const vector<vector<string>>& IR, vector<byte_t>* bytecode) {
+    vector<byte_t> result;
     size_t instr_pos = 0;
     for (const vector<string>& instr : IR) {
-        char opcode = -1;
+        byte_t opcode = 255;
         const string& instr_name = instr[0];
         for (short i = 0; i < INSTR_COUNT; i++) {
             const string& current = instruction_table[i];
@@ -119,37 +118,34 @@ void translate(const vector<vector<string>>& IR, vector<vector<char>>* bytecode)
                 break;
             }
         }
-        if (opcode == -1) {
+        if (opcode == 255) {
             error("Invalid instruction", to_string(instr_pos));
             errors_found++;
         }
-        wip_instr.push_back(opcode);
+        result.push_back(opcode);
         for (short i = 1; i < INSTR_SIZE; i++) {
             string comp = instr[i];
             if (comp.empty()) {
-                wip_instr.push_back(0);
+                result.push_back(0);
             } else if (
                 startsWith(comp, "addr") ||
                 startsWith(comp, "n")
             ) {
                 comp = trimNonInt(comp);
-                wip_instr.push_back(static_cast<char>(stoi(comp)));
+                result.push_back(static_cast<byte_t>(stoi(comp)));
             } else if (startsWith(comp, "reg")) {
                 validateRegister(comp, instr_pos);
                 comp = trimNonInt(comp);
-                wip_instr.push_back(static_cast<char>(stoi(comp)));
+                result.push_back(static_cast<byte_t>(stoi(comp)));
             } else {
                 if (comp.size() == 1) {
-                    wip_instr.push_back(comp[0]);
+                    result.push_back(static_cast<byte_t>(comp[0]));
                 } else {
                     error("Label/Macro not found: " + comp, to_string(instr_pos));
                     errors_found++;
                 }
             }
         }
-        wip_instr.shrink_to_fit();
-        result.push_back(wip_instr);
-        wip_instr.clear();
         instr_pos++;
     }
     bytecode->swap(result);

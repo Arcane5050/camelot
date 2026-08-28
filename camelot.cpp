@@ -9,14 +9,22 @@
 static bool do_verbose = false;
 
 int main(int argc, char** argv) {
+    ofstream file; // put this at the top so it doesn't fuck up the memory
     if (argc == 1) {
         cout << "Usage: camelot <files*> [--verbose]\n";
         return 0;
     }
     vector<string> lines;
+    string out_file = "out.mpa";
     for (size_t i = 1; i < argc; i++) {
         if (strcmp(argv[i], "--verbose") == 0) {
             do_verbose = true;
+        } else if (strcmp(argv[i], "--out") == 0) {
+            if (i + 1 >= argc) {
+                error("Expected output file path", FAIL_PREFIX);
+                return 1;
+            }
+            out_file = argv[++i];
         } else {
             ifstream file(argv[i]);
             if (!file.is_open()) {
@@ -57,23 +65,20 @@ int main(int argc, char** argv) {
     verbose("Inlined all labels", LABELS_PREFIX);
     inlineMacros(&IR);
     verbose("Inlined all macros", MACROS_PREFIX);
-    vector<vector<char>> bytecode;
+    vector<byte_t> bytecode;
     translate(IR, &bytecode);
     verbose("Translated all instructions and arguments to 8-bit integers", PARSER_PREFIX);
     if (errors_found > 0) {
         error(to_string(errors_found) + " error(s) found", FAIL_PREFIX);
         return 1;
     }
-    verbose("Completed", "");
-    cout << "[\n";
-    for (const vector<char>& instr : bytecode) {
-        cout << "  [ ";
-        for (const char& c : instr) {
-            cout << static_cast<int>(c) << ", ";
-        }
-        cout << "],\n";
+    file.open(out_file, ios::binary);
+    for (byte_t byte : bytecode) {
+        file << byte;
     }
-    cout << "]\n";
+    file.close();
+
+    verbose("Completed", "");
 }
 
 void error(const string& msg, const string& prefix) {
