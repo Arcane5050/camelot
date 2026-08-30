@@ -17,9 +17,9 @@ int main(int argc, char** argv) {
     vector<string> lines;
     string out_file = "out.abf";
     for (size_t i = 1; i < argc; i++) {
-        if (strcmp(argv[i], "--verbose") == 0) {
+        if (strcmp(argv[i], "--verbose") == 0 || strcmp(argv[i], "-v") == 0) {
             do_verbose = true;
-        } else if (strcmp(argv[i], "--out") == 0) {
+        } else if (strcmp(argv[i], "--out") == 0 || strcmp(argv[i], "-o") == 0) {
             if (i + 1 >= argc) {
                 error("Expected output file path", FAIL_PREFIX);
                 return 1;

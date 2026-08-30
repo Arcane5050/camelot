@@ -3,13 +3,15 @@
 static map<string, string> label_table = {};
 
 void parseLabels(vector<string>* lines) {
+    size_t instr_index = 0;
     for (size_t i = 0; i < EOF_; i++) {
         const string& line = lines->at(i);
         if (!line.empty()) {
             if (line[line.size() - 1] == ':') {
-                label_table[line.substr(0, line.size() - 1)] = to_string(i);
+                label_table[line.substr(0, line.size() - 1)] = to_string(instr_index);
                 lines->at(i) = "";
             }
+            instr_index++;
         }
     }
 }
