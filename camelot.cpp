@@ -26,17 +26,17 @@ int main(int argc, char** argv) {
             }
             out_file = argv[++i];
         } else {
-            ifstream file(argv[i]);
-            if (!file.is_open()) {
+            ifstream current_file(argv[i]);
+            if (!current_file.is_open()) {
                 error("File failed to open", argv[i]);
                 errors_found++;
             } else {
                 string current_line;
-                while (getline(file, current_line)) {
+                while (getline(current_file, current_line)) {
                     lines.push_back(current_line);
                 }
             }
-            file.close();
+            current_file.close();
         }
     }
     if (lines.empty()) {
