@@ -21,8 +21,9 @@ inline int errors_found = 0;
 inline size_t EOF_;
 inline constexpr int reg_count = 32;
 
-void error(const string& msg, const string& prefix);
-void verbose(const string& msg, const string& prefix);
+void error(const string& msg, long long position = -1);
+void verbose(const string& msg);
+void subVerbose(const string& msg);
 
 void validateRegister(const string& reg, size_t location);
 

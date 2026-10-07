@@ -1,15 +1,25 @@
 #include "camelot.hpp"
+
 #include <sstream>
 #include <cstring>
+using namespace std;
 
 #include "parser.hpp"
 #include "labels.hpp"
 #include "macros.hpp"
 
+#define BOLD    "\033[1m"
+#define REGULAR "\033[39;0m"
+#define GREEN   "\033[92m"
+#define CYAN    "\033[96m"
+#define YELLOW  "\033[93m"
+#define RED     "\033[91m"
+
 static bool do_verbose = false;
+static vector<string> errors;
 
 int main(int argc, char** argv) {
-    ofstream file; // put this at the top so it doesn't fuck up the memory
+    ofstream file;
     if (argc == 1) {
         cout << "Usage: camelot <files*> [--verbose]\n";
         return 0;
@@ -21,14 +31,14 @@ int main(int argc, char** argv) {
             do_verbose = true;
         } else if (strcmp(argv[i], "--out") == 0 || strcmp(argv[i], "-o") == 0) {
             if (i + 1 >= argc) {
-                error("Expected output file path", FAIL_PREFIX);
+                error("Expected output file path");
                 return 1;
             }
             out_file = argv[++i];
         } else {
             ifstream current_file(argv[i]);
             if (!current_file.is_open()) {
-                error("File failed to open", argv[i]);
+                error("File '" + string(argv[i]) + "' failed to open");
                 errors_found++;
             } else {
                 string current_line;
@@ -40,36 +50,44 @@ int main(int argc, char** argv) {
         }
     }
     if (lines.empty()) {
-        error("All files failed to open", FAIL_PREFIX);
+        error("All files failed to open");
         return 1;
     }
+    verbose("Formatting");
+    subVerbose("Removed blank lines");
     lines.shrink_to_fit();
     EOF_ = lines.size();
     vector<vector<string>> IR;
     trimIndent_trailingSpaces(&lines);
-    verbose("Removed indent and trailing spaces", FORMAT_PREFIX);
+    subVerbose("Removed indent");
+    verbose("Labels");
     parseLabels(&lines);
-    verbose("Parsed all labels", LABELS_PREFIX);
+    verbose("Formatting");
     removeEmptyLines(&lines);
+    subVerbose("Removed empty lines");
     EOF_ = lines.size();
-    verbose("Removed all empty lines", FORMAT_PREFIX);
     if (lines.empty()) {
-        error("No instructions found", FAIL_PREFIX);
+        error("No instructions found");
         return 1;
     }
+    verbose("Parsing");
     splitSpaces(lines, &IR);
-    verbose("Split all lines by spaces", LABELS_PREFIX);
+    subVerbose("Parsed text");
+    verbose("Macros");
     parseMacros(&IR);
-    verbose("Parsed all macros", MACROS_PREFIX);
+    verbose("Inlining");
     inlineLabels(&IR);
-    verbose("Inlined all labels", LABELS_PREFIX);
+    subVerbose("Inlined labels");
     inlineMacros(&IR);
-    verbose("Inlined all macros", MACROS_PREFIX);
+    subVerbose("Inlined macros");
+    verbose("Bytecode");
     vector<byte_t> bytecode;
     translate(IR, &bytecode);
-    verbose("Translated all instructions and arguments to 8-bit integers", PARSER_PREFIX);
     if (errors_found > 0) {
-        error(to_string(errors_found) + " error(s) found", FAIL_PREFIX);
+        cout << BOLD ":: " RED "Error(s) (" << to_string(errors_found) << ")\n" REGULAR;
+        for (const string& error : errors) {
+            cout << error << "\n";
+        }
         return 1;
     }
     file.open(out_file, ios::binary);
@@ -78,26 +96,38 @@ int main(int argc, char** argv) {
     }
     file.close();
 
-    verbose("Completed", "");
+    verbose("Completed");
 }
 
-void error(const string& msg, const string& prefix) {
-    cout << "\033[38;2;255;0;0m[@] " << prefix << ": " << msg << "\033[39m\n";
+void error(const string& msg, const long long position) {
+    errors.emplace_back(BOLD "  :: " REGULAR RED + msg + REGULAR);
+    if (position != -1) {
+        errors.emplace_back(BOLD RED "    ==> " REGULAR CYAN "At position " + to_string(position));
+    }
 }
 
-void verbose(const string& msg, const string& prefix) {
+void verbose(const string& msg) {
     if (do_verbose) {
-        string color = "\033[38;2;0;255;0m[!] ";
+        string color = BOLD CYAN;
         if (errors_found > 0) {
-            color = "\033[38;2;255;255;0m[!] ";
+            color = REGULAR YELLOW;
         }
-        cout << color << prefix << ": " << msg << "\033[39m\n";
+        cout << BOLD ":: " << color << msg << REGULAR "\n";
+    }
+}
+void subVerbose(const string& msg) {
+    if (do_verbose) {
+        string color = BOLD GREEN;
+        if (errors_found > 0) {
+            color = BOLD YELLOW;
+        }
+        cout << color << "  ==> " REGULAR CYAN << msg << REGULAR "\n";
     }
 }
 
 void validateRegister(const string &reg, const size_t location) {
     if (stoi(trimNonInt(reg)) > reg_count) {
-        error("Register index cannot be above " + to_string(reg_count), to_string(location));
+        error("Register index cannot be above " + to_string(reg_count), static_cast<long long>(location));
         errors_found++;
     }
 }

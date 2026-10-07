@@ -118,7 +118,7 @@ void translate(const vector<vector<string>>& IR, vector<byte_t>* bytecode) {
             }
         }
         if (opcode == 255) {
-            error("Invalid instruction", to_string(instr_pos));
+            error("Invalid instruction '" + instr_name + "'", static_cast<long long>(instr_pos));
             errors_found++;
         }
         result.push_back(opcode);
@@ -140,13 +140,14 @@ void translate(const vector<vector<string>>& IR, vector<byte_t>* bytecode) {
                 if (comp.size() == 1) {
                     result.push_back(static_cast<byte_t>(comp[0]));
                 } else {
-                    error("Label/Macro not found: " + comp, to_string(instr_pos));
+                    error("Label/Macro '" + comp + "' not found", static_cast<long long>(instr_pos));
                     errors_found++;
                 }
             }
         }
         instr_pos++;
     }
+    subVerbose("Translated " + to_string(instr_pos) + " instructions");
     bytecode->swap(result);
     bytecode->shrink_to_fit();
 }

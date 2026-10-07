@@ -16,11 +16,13 @@ void parseMacros(vector<vector<string>>* IR) {
             const string& reg = instr->at(2);
             validateRegister(reg, i);
             macro_table[instr->at(0)] = reg;
+            subVerbose("Found macro '" + instr->at(0) + "'");
             replaced[1] = val;
             replaced[2] = reg;
             *instr = replaced;
         }
     }
+    subVerbose("Found " + to_string(macro_table.size() - 2) + " macros");
 }
 
 void inlineMacros(vector<vector<string>>* IR) {

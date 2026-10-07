@@ -8,12 +8,15 @@ void parseLabels(vector<string>* lines) {
         const string& line = lines->at(i);
         if (!line.empty()) {
             if (line[line.size() - 1] == ':') {
-                label_table[line.substr(0, line.size() - 1)] = to_string(instr_index);
+                const string id = line.substr(0, line.size() - 1);
+                label_table[id] = to_string(instr_index);
                 lines->at(i) = "";
+                subVerbose("Found label '" + id + "'");
             }
             instr_index++;
         }
     }
+    subVerbose("Found " + to_string(label_table.size()) + " labels");
 }
 
 void inlineLabels(vector<vector<string>>* IR) {
