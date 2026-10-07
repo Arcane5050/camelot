@@ -21,7 +21,13 @@ static vector<string> errors;
 int main(int argc, char** argv) {
     ofstream file;
     if (argc == 1) {
-        cout << "Usage: camelot <files*> [--verbose]\n";
+        cout << ("--= CAMELOT =--\n"
+                 "The Arthur ASM assembler\n"
+                 "\n"
+                 "Usage: camelot <files[]> -o <outfile> [flags]\n"
+                 "\n"
+                 "FLAGS:\n"
+                 "  --verbose, -v : Turn on verbose mode\n");
         return 0;
     }
     vector<string> lines;
