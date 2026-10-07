@@ -22,11 +22,12 @@ void parseMacros(vector<vector<string>>* IR) {
             *instr = replaced;
         }
     }
-    subVerbose("Found " + to_string(macro_table.size() - 2) + " macros");
+    subVerbose("Found " + to_string(macro_table.size() - 2) + " macro(s)");
 }
 
 void inlineMacros(vector<vector<string>>* IR) {
     const size_t max = IR->size();
+    size_t macros_inlined = 0;
     for (size_t i = 0; i < max; i++) {
         vector<string>* instr = &IR->at(i);
         for (size_t comp_index = 1; comp_index < INSTR_SIZE; comp_index++) {
@@ -35,10 +36,13 @@ void inlineMacros(vector<vector<string>>* IR) {
                 auto macro_table_index = macro_table.find(*comp);
                 if (macro_table_index != macro_table.end()) {
                     *comp = "addr" + macro_table_index->second;
+                    macros_inlined++;
                 } else if (*comp == "#HERE") {
                     *comp = "addr" + to_string(i);
+                    macros_inlined++;
                 }
             }
         }
     }
+    subVerbose("Inlined " + to_string(macros_inlined) + " macro(s)");
 }

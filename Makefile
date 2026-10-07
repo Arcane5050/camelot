@@ -8,5 +8,6 @@ $(EXE) :
 	g++ $(SOURCES) $(HEADERS) -o $(EXE) -ggdb
 
 release :
-	g++ $(SOURCES) $(HEADERS) -o $(EXE) -O3 -Os
+	g++ $(SOURCES) $(HEADERS) -o $(EXE) -O3 -Os -static-libgcc -static-libstdc++ -static
 	strip $(EXE)
+	upx -9 $(EXE)

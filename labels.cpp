@@ -16,10 +16,11 @@ void parseLabels(vector<string>* lines) {
             instr_index++;
         }
     }
-    subVerbose("Found " + to_string(label_table.size()) + " labels");
+    subVerbose("Found " + to_string(label_table.size()) + " label(s)");
 }
 
 void inlineLabels(vector<vector<string>>* IR) {
+    size_t labels_inlined = 0;
     for (size_t i = 0; i < EOF_; i++) {
         vector<string>* instr = &IR->at(i);
         for (size_t comp_index = 1; comp_index < INSTR_SIZE; comp_index++) {
@@ -28,8 +29,10 @@ void inlineLabels(vector<vector<string>>* IR) {
                 auto label_table_index = label_table.find(*comp);
                 if (label_table_index != label_table.end()) {
                     *comp = "addr" + label_table_index->second;
+                    labels_inlined++;
                 }
             }
         }
     }
+    subVerbose("Inlined " + to_string(labels_inlined) + " label(s)");
 }

@@ -59,13 +59,14 @@ int main(int argc, char** argv) {
         error("All files failed to open");
         return 1;
     }
-    verbose("Formatting");
-    subVerbose("Removed blank lines");
     lines.shrink_to_fit();
     EOF_ = lines.size();
     vector<vector<string>> IR;
-    trimIndent_trailingSpaces(&lines);
-    subVerbose("Removed indent");
+    verbose("Formatting");
+    removeIndent_comments(&lines);
+    subVerbose("Removed indent and comments");
+    trimTrailingSpaces(&lines);
+    subVerbose("Removed trailing spaces");
     verbose("Labels");
     parseLabels(&lines);
     verbose("Formatting");
@@ -83,9 +84,8 @@ int main(int argc, char** argv) {
     parseMacros(&IR);
     verbose("Inlining");
     inlineLabels(&IR);
-    subVerbose("Inlined labels");
     inlineMacros(&IR);
-    subVerbose("Inlined macros");
+    subVerbose("Inlined macro(s)");
     verbose("Bytecode");
     vector<byte_t> bytecode;
     translate(IR, &bytecode);
@@ -108,7 +108,7 @@ int main(int argc, char** argv) {
 void error(const string& msg, const long long position) {
     errors.emplace_back(BOLD "  :: " REGULAR RED + msg + REGULAR);
     if (position != -1) {
-        errors.emplace_back(BOLD RED "    ==> " REGULAR CYAN "At position " + to_string(position));
+        errors.emplace_back(BOLD RED "    ==> " REGULAR CYAN "At position " + to_string(position) + REGULAR);
     }
 }
 
@@ -132,7 +132,7 @@ void subVerbose(const string& msg) {
 }
 
 void validateRegister(const string &reg, const size_t location) {
-    if (stoi(trimNonInt(reg)) > reg_count) {
+    if (stoi(trimNonInt(reg)) >= reg_count) {
         error("Register index cannot be above " + to_string(reg_count), static_cast<long long>(location));
         errors_found++;
     }

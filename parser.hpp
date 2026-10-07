@@ -10,7 +10,8 @@ using namespace std;
 vector<string> splitLineBySpaces(const string& line);
 string trimNonInt(const string& source);
 
-void trimIndent_trailingSpaces(vector<string>* lines);
+void trimTrailingSpaces(vector<string>* lines);
+void removeIndent_comments(vector<string>* lines);
 void removeEmptyLines(vector<string>* lines);
 void splitSpaces(const vector<string>& lines, vector<vector<string>>* dest);
 void translate(const vector<vector<string>>& IR, vector<byte_t>* bytecode);

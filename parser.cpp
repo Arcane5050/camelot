@@ -31,26 +31,45 @@ void removeEmptyLines(vector<string>* lines) {
     lines->shrink_to_fit();
 }
 
-void trimIndent_trailingSpaces(vector<string>* lines) {
+void trimTrailingSpaces(vector<string>* lines) {
     for (size_t i = 0; i < EOF_; i++) {
         const string& current_line = lines->at(i);
-        const size_t max = current_line.size();
-        size_t front = 0;
-        while (isspace(current_line[front])) {
-            front++;
-            if (front > max) {
-                break;
-            }
+        if (current_line.empty()) {
+            continue;
         }
+        const size_t max = current_line.size();
         size_t back = max;
+        bool skip_substr = false;
         while (isspace(current_line[back])) {
             back--;
-            if (back < 0) {
+            if (back == 0) {
+                lines->at(i) = "";
+                skip_substr = true;
                 break;
             }
         }
-        const string trimmed = current_line.substr(front, back - front);
-        lines->at(i) = trimmed;
+        if (!skip_substr) {
+            lines->at(i) = current_line.substr(max - back, max);
+        }
+    }
+}
+
+void removeIndent_comments(vector<string>* lines) {
+    size_t pos = 0;
+    size_t max = lines->size();
+    for (string* current = &lines->at(pos); pos < max; pos++) {
+        current = &lines->at(pos);
+        if (current->empty()) {
+            continue;
+        }
+        size_t line_max = current->size();
+        size_t start = 0;
+        while (start < line_max && isspace(current->at(start))) ++start;
+        size_t stop = start;
+        while (stop < line_max && current->at(stop) != ';') {
+            stop++;
+        }
+        *current = current->substr(start, stop - start);
     }
 }
 
